@@ -257,11 +257,59 @@ const popupHTML = `
   </div>
 `;
 
-L.marker([lat,lng])
-  .bindPopup(popupHTML, {maxWidth:320})
-  .addTo(markers);
-
 bounds.push([lat,lng]);
+});
+
+reefGroups.forEach((group) => {
+  const lat = group[0].lat;
+  const lng = group[0].lng;
+
+  const historyHTML = group.map(report => `
+    <div style="padding:8px 0;border-bottom:1px solid #ddd;">
+      <strong>${safe(formatDate(report.timestamp))}</strong>
+      <br>
+      <strong>${safe(report.type)}</strong>
+      <br>
+      ${safe(report.notes || 'No notes provided')}
+      <br>
+      <small>Report #${report.id}</small>
+    </div>
+  `).join('');
+
+  const popupHTML = `
+    <div style="min-width:220px;max-height:260px;overflow-y:auto;">
+      <h3>Reef Monitoring History</h3>
+      <p>${group.length} observation(s) in this reef area.</p>
+      ${historyHTML}
+      <p style="font-size:10px;color:#888;">
+        Community-submitted observations. Not scientifically verified.
+      </p>
+    </div>
+  `;
+
+  const icon = L.divIcon({
+    className: '',
+    html: `<div style="
+      width:42px;
+      height:42px;
+      background:#159b88;
+      color:white;
+      border:3px solid white;
+      border-radius:50%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:bold;
+      font-size:17px;
+      box-shadow:0 2px 8px #0004;
+    ">${group.length}</div>`,
+    iconSize: [42,42],
+    iconAnchor: [21,21]
+  });
+
+  L.marker([lat,lng], {icon})
+    .bindPopup(popupHTML, {maxWidth:320})
+    .addTo(markers);
 });
 
    if (bounds.length) map.fitBounds(bounds,{maxZoom:7,padding:[26,26]});
