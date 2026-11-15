@@ -222,14 +222,48 @@ const reefGroups = groupReefReports(reefReports);
        ${validURL?`<img src="${safe(validURL)}" alt="User-provided reef observation photo" loading="lazy" referrerpolicy="no-referrer"><div><a href="${safe(validURL)}" target="_blank" rel="noopener noreferrer" class="link">View full photo ↗</a></div>`:''}
        <p><a class="link" target="_blank" rel="noopener noreferrer" href="${safe(link)}">Verify contract on Monad ↗</a></p>`;
      list.appendChild(item);
-          list.appendChild(item);
+   
+const reefGroup = reefGroups.find(group =>
+  group.some(report => report.id === id)
+);
 
-// PASTE THE ENTIRE NEW POPUP CODE HERE
+const historyHTML = reefGroup.map(report => `
+  <div style="padding:8px 0;border-bottom:1px solid #ddd;">
+    <strong>${safe(formatDate(report.timestamp))}</strong>
+    <br>
+    <span style="color:#168b7c;font-weight:bold;">
+      ${safe(report.type)}
+    </span>
+    <br>
+    ${safe(report.notes || 'No notes provided')}
+    <br>
+    <small>Report #${report.id}</small>
+  </div>
+`).join('');
 
-      bounds.push([lat,lng]);
-    });
-     bounds.push([lat,lng]);
-   });
+const popupHTML = `
+  <div style="min-width:220px;max-height:260px;overflow-y:auto;">
+    <h3 style="margin:0 0 8px;color:#116b60;">
+      Reef Monitoring History
+    </h3>
+    <p style="font-size:12px;margin:0 0 8px;">
+      ${reefGroup.length} observation(s) in this nearby reef area.
+    </p>
+    ${historyHTML}
+    <p style="font-size:10px;color:#888;">
+      Community-submitted observations.
+      Not scientifically verified.
+    </p>
+  </div>
+`;
+
+L.marker([lat,lng])
+  .bindPopup(popupHTML, {maxWidth:320})
+  .addTo(markers);
+
+bounds.push([lat,lng]);
+});
+
    if (bounds.length) map.fitBounds(bounds,{maxZoom:7,padding:[26,26]});
  } catch(err) { $('count').textContent='Could not load'; status(`Read error: ${err.shortMessage || err.message}. Check contract address and Testnet RPC.`);}
 }
