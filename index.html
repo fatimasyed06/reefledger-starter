@@ -222,9 +222,12 @@ const reefGroups = groupReefReports(reefReports);
        ${validURL?`<img src="${safe(validURL)}" alt="User-provided reef observation photo" loading="lazy" referrerpolicy="no-referrer"><div><a href="${safe(validURL)}" target="_blank" rel="noopener noreferrer" class="link">View full photo ↗</a></div>`:''}
        <p><a class="link" target="_blank" rel="noopener noreferrer" href="${safe(link)}">Verify contract on Monad ↗</a></p>`;
      list.appendChild(item);
-     const reefGroup = reefGroups.find(group =>
-  group.some(report => report.id === id)
-);
+          list.appendChild(item);
+
+// PASTE THE ENTIRE NEW POPUP CODE HERE
+
+      bounds.push([lat,lng]);
+    });
      bounds.push([lat,lng]);
    });
    if (bounds.length) map.fitBounds(bounds,{maxZoom:7,padding:[26,26]});
