@@ -112,7 +112,7 @@ function entryHtml(r){const candidates=gatewayCandidates(r.url);const url=candid
  return `<article class="entry"><div class="entryhead"><span class="type">#${r.id} · ${esc(TYPES[r.type]||'Unknown category')}</span><span class="status">UNVERIFIED REPORT</span></div>
  <div class="date">Submitted ${esc(dateTime(r.when))}</div><div class="notes">${esc(r.notes||'No description provided.')}</div>${photo}
  <div class="small">${r.lat.toFixed(6)}, ${r.lng.toFixed(6)} · Reporter: ${esc(shortAddress(r.reporter))}</div>
- <div class="rowlinks"><a href="https://testnet.monadvision.com/address/${esc(CONTRACT_ADDRESS)}" target="_blank" rel="noopener noreferrer">View contract ↗</a>${canVerify?`<button type="button" class="textbtn" data-verify="${r.id}">Verify photo hash</button>`:''}</div>
+ <div class="rowlinks"><a href="https://testnet.monadscan.com/address/${esc(CONTRACT_ADDRESS)}" target="_blank" rel="noopener noreferrer">View contract ↗</a>${canVerify?`<button type="button" class="textbtn" data-verify="${r.id}">Verify photo hash</button>`:''}</div>
  <div class="verifyresult" id="verify-${r.id}" role="status">${url&&!canVerify?'No on-chain photo hash; image cannot be verified.':''}</div></article>`;}
 function showDetail(g){const items=g.items, first=items[0], last=items.at(-1);
  $('detail').innerHTML=`<div class="panelhead"><h2 style="margin:0">${items.length>1?'Reef hotspot':'Single observation'}</h2><span class="pill">${items.length} report${items.length===1?'':'s'}</span></div>
