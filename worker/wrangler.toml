@@ -1,0 +1,15 @@
+name = "reefledger-upload"
+main = "src/index.js"
+compatibility_date = "2024-11-12"
+
+# Non-secret config. Add your GitHub Pages origin after you know it, e.g.
+# https://fatimasyed06.github.io
+[vars]
+# Redeploy after changing this list. Include every browser Origin that will call the worker.
+# GitHub Pages Origin is the host only (no /repo path).
+ALLOWED_ORIGINS = "http://localhost:3000,http://127.0.0.1:3000,https://fatimasyed06.github.io"
+IPFS_GATEWAY = "https://gateway.pinata.cloud/ipfs/"
+
+# Set the permanent Pinata JWT with:
+#   npx wrangler secret put PINATA_JWT
+# Never commit the JWT.
