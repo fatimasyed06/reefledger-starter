@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ReefLedger — Document the damage. Protect the reef.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+:root{font-family:'DM Sans',system-ui,sans-serif;color:#153e39;background:#f2f8f5;font-synthesis:none}
+*{box-sizing:border-box}body{margin:0}button,input,select,textarea{font:inherit}button{cursor:pointer}a{color:#12766b}
+header{background:#083b37;color:white;padding:14px max(22px,calc((100vw - 1250px)/2));display:flex;align-items:center;justify-content:space-between;gap:18px}
+.brand{font:800 23px Manrope,sans-serif;letter-spacing:-1px}.brand span{color:#66dec2}.subtitle{font-size:11px;color:#b8dfd5;letter-spacing:.08em;text-transform:uppercase}
+#connectBtn,.primary{background:#16a085;color:white;border:0;border-radius:11px;padding:12px 17px;font-weight:700}.connect{background:#145951!important}button:disabled{opacity:.55;cursor:not-allowed}
+main{max-width:1260px;margin:auto;padding:27px 20px 60px}.hero{display:flex;align-items:end;justify-content:space-between;gap:25px;margin-bottom:23px}.eyebrow{text-transform:uppercase;letter-spacing:2px;font-weight:800;font-size:11px;color:#218b7d}h1,h2,h3{font-family:Manrope,sans-serif;letter-spacing:-.04em}h1{font-size:clamp(28px,4vw,43px);margin:5px 0 6px}h2{font-size:21px;margin:0 0 13px}p{line-height:1.5;color:#52716b}.hero p{margin:0}.pill{background:#ddf5ed;color:#176f62;border:1px solid #b5e9d7;padding:8px 12px;border-radius:100px;font-size:12px;font-weight:700;white-space:nowrap}
+.layout{display:grid;grid-template-columns:minmax(310px,390px) minmax(0,1fr);gap:18px;align-items:start}.panel{border:1px solid #d8e8e0;background:#fff;border-radius:19px;padding:20px;box-shadow:0 6px 24px #164e3410}label{display:block;font-weight:700;font-size:12px;margin:14px 0 6px}input,select,textarea{width:100%;border:1px solid #d1ded8;border-radius:9px;padding:11px 12px;background:#fcfefd;color:#1d4440;outline-color:#43bba6}textarea{min-height:80px;resize:vertical}.pair{display:grid;grid-template-columns:1fr 1fr;gap:10px}.fine{color:#728982;font-size:11px;line-height:1.5}.primary{margin-top:17px;width:100%;padding:13px}#status{font-size:12px;color:#376d63;line-height:1.55;margin:12px 0 0;white-space:pre-line;overflow-wrap:anywhere}.mapPanel{padding:14px}.mapHeader{padding:7px 6px 14px;display:flex;justify-content:space-between;align-items:center}#map{height:470px;border-radius:13px;background:#d7eae5}.badge{background:#f0f8f4;border-radius:8px;padding:6px 10px;color:#357b6c;font-size:12px;font-weight:700}.cards{display:grid;gap:10px;margin-top:17px}.record{background:white;border:1px solid #dfebe4;border-radius:13px;padding:13px}.recordHead{display:flex;justify-content:space-between;gap:10px;align-items:center}.record h3{font-size:14px;margin:0}.record p{font-size:12px;margin:5px 0}.record img{max-width:100%;max-height:180px;object-fit:cover;border-radius:10px;margin-top:8px}.tag{color:#207a6e;font-size:11px;font-weight:800}.empty{padding:24px;background:#f3faf6;text-align:center;color:#78928a;border-radius:12px}.footnote{margin-top:20px;font-size:11px;color:#798d87}.info{border-left:3px solid #2eab97;padding:8px 10px;background:#f1f9f6;font-size:12px;color:#4c756b;border-radius:4px}.link{font-size:12px;text-decoration:none}.tiny{font-size:10px;color:#9da8a5}.loading{opacity:.7}
+@media(max-width:780px){header{padding:13px 18px}.layout{grid-template-columns:1fr}.hero{align-items:start;flex-direction:column}#map{height:320px}h1{font-size:30px}.pair{gap:8px}}
+</style>
+</head>
+<body>
+<header><div><div class="brand">reef<span>ledger.</span> 🪸</div><div class="subtitle">Powered by Monad Testnet</div></div><button id="connectBtn" class="connect">Connect wallet</button></header>
+<main>
+<section class="hero"><div><div class="eyebrow">Open ocean evidence network</div><h1>Document the damage.<br>Protect the reef.</h1><p>Public reef observations, permanently anchored on-chain.</p></div><div id="count" class="pill">Loading observations…</div></section>
+<div class="layout">
+<section class="panel"><h2>Report reef damage</h2><div class="info">Hackathon demo: use fictional coordinates or existing non-sensitive public sites. Submissions are publicly visible and cannot be erased from the chain.</div>
+<form id="reportForm">
+<div class="pair"><div><label for="lat">Latitude</label><input id="lat" type="number" step="any" min="-90" max="90" placeholder="-18.0000" required /></div><div><label for="lng">Longitude</label><input id="lng" type="number" step="any" min="-180" max="180" placeholder="147.0000" required /></div></div>
+<label for="damage">Damage category</label><select id="damage"><option value="0">Bleaching</option><option value="1">Physical damage</option><option value="2">Disease</option><option value="3">Pollution</option><option value="4">Other / uncertain</option></select>
+<label for="photo">Photo file (hashed locally; not uploaded)</label><input id="photo" type="file" accept="image/*"/><div class="fine">We'll fingerprint the original file so its integrity can later be checked.</div>
+<label for="photoURL">Public photo URL (optional if a file is selected)</label><input id="photoURL" type="url" placeholder="https://…"/><div class="fine">Paste a publicly hosted photo URL to make the evidence viewable by everyone. File uploads here are only hashed, not hosted.</div>
+<label for="notes">Observation notes</label><textarea id="notes" maxlength="400" placeholder="What was observed? (Unverified citizen report)"></textarea>
+<button class="primary" id="submitBtn" type="submit">Submit to Monad Testnet</button><div id="status">Connect your wallet to submit. You can browse without a wallet.</div>
+</form></section>
+<section class="panel mapPanel"><div class="mapHeader"><h2 style="margin:0">Explore the reef</h2><button id="refreshBtn" class="badge" style="border:0">↻ Refresh</button></div><div id="map"></div><div class="cards" id="records"><div class="empty">No observations yet. Be the first to submit a test report.</div></div></section>
+</div><div class="footnote">ReefLedger is a prototype, not a verified scientific database. Locations and classifications are user-submitted claims. On-chain fingerprints detect changes, not whether claims are true. Photos at external URLs can disappear or change.</div>
+</main>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script type="module">
+import { ethers } from 'https://cdn.jsdelivr.net/npm/ethers@6.15.0/+esm';
+
+// AFTER DEPLOYING IN REMIX: PASTE THE DEPLOYED CONTRACT ADDRESS HERE.
+const CONTRACT_ADDRESS = 'PASTE_DEPLOYED_CONTRACT_ADDRESS_HERE';
+const RPC_URL = 'https://testnet-rpc.monad.xyz';
+const CHAIN_ID = 10143n;
+const EXPLORER = 'https://testnet.monadvision.com';
+const ABI = [
+ 'function submitReport(int32 latitudeE6,int32 longitudeE6,uint8 damageType,bytes32 photoHash,string photoURL,string notes) returns (uint256)',
+ 'function reportCount() view returns (uint256)',
+ 'function getReport(uint256 reportId) view returns (tuple(address reporter,int32 latitudeE6,int32 longitudeE6,uint8 damageType,bytes32 photoHash,string photoURL,string notes,uint64 submittedAt))',
+ 'event ReportSubmitted(uint256 indexed reportId,address indexed reporter,int32 latitudeE6,int32 longitudeE6,uint8 damageType,bytes32 photoHash)'
+];
+const TYPES = ['Bleaching','Physical damage','Disease','Pollution','Other / uncertain'];
+const $ = (id) => document.getElementById(id);
+const ready = ethers.isAddress(CONTRACT_ADDRESS);
+let signer, readProvider, contract;
+const map = L.map('map').setView([5, 30], 2);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom: 18, attribution: '© OpenStreetMap contributors'}).addTo(map);
+let markers = L.layerGroup().addTo(map);
+const status = (s) => { $('status').textContent = s; };
+const safe = (s) => String(s ?? '').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const formatDate = (v) => new Date(Number(v)*1000).toLocaleString();
+const hexZero = '0x' + '0'.repeat(64);
+const tag = (a) => `${a.slice(0,6)}…${a.slice(-4)}`;
+
+async function prepareRead() {
+ if (!ready) {
+   $('count').textContent = 'Contract not configured';
+   status('First deploy ReefLedger.sol in Remix, then paste the contract address into index.html.');
+   return false;
+ }
+ if (!readProvider) readProvider = new ethers.JsonRpcProvider(RPC_URL, Number(CHAIN_ID));
+ if (!contract) contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, readProvider);
+ return true;
+}
+
+async function connectWallet() {
+ if (!window.ethereum) {status('Install a browser wallet like MetaMask or use a wallet-enabled browser.');return;}
+ try {
+   let provider = new ethers.BrowserProvider(window.ethereum);
+   await provider.send('eth_requestAccounts', []);
+   const network = await provider.getNetwork();
+   if (network.chainId !== CHAIN_ID) {
+     try { await window.ethereum.request({method:'wallet_switchEthereumChain', params:[{chainId:'0x279f'}]}); }
+     catch(err) {
+       if(err.code !== 4902) throw err;
+       await window.ethereum.request({method:'wallet_addEthereumChain', params:[{chainId:'0x279f',chainName:'Monad Testnet',rpcUrls:[RPC_URL],nativeCurrency:{name:'MON',symbol:'MON',decimals:18},blockExplorerUrls:[EXPLORER]}]});
+     }
+   }
+   provider = new ethers.BrowserProvider(window.ethereum);
+   signer = await provider.getSigner();
+   $('connectBtn').textContent = tag(await signer.getAddress());
+   status('Wallet connected. You can submit a report.');
+   await loadReports();
+ } catch(err) {status(`Wallet connection error: ${err.shortMessage || err.message}`);}
+}
+
+async function photoHash(file) {
+ if (!file) return hexZero;
+ const buffer = await file.arrayBuffer();
+ return ethers.sha256(new Uint8Array(buffer));
+}
+
+async function submitReport(event) {
+ event.preventDefault();
+ if (!(await prepareRead())) return;
+ if (!signer) {await connectWallet(); if(!signer)return;}
+ const button = $('submitBtn');
+ const lat = Number($('lat').value), lng = Number($('lng').value);
+ if (!Number.isFinite(lat) || !Number.isFinite(lng) || Math.abs(lat)>90 || Math.abs(lng)>180) {status('Coordinates are invalid.');return;}
+ const file = $('photo').files[0];
+ const url = $('photoURL').value.trim();
+ if (!file && !url) { status('Select a photo file or enter a public photo URL.'); return; }
+ if (url && !/^https:\/\//i.test(url)) { status('Only HTTPS photo URLs are supported.'); return; }
+ button.disabled = true;
+ try {
+   status('Hashing evidence and preparing transaction…');
+   const hash = await photoHash(file);
+   const contractForWrite = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
+   const tx = await contractForWrite.submitReport(
+     Math.round(lat*1e6), Math.round(lng*1e6), Number($('damage').value), hash, url, $('notes').value
+   );
+   status(`Transaction submitted: ${tx.hash}\nWaiting for confirmation…`);
+   await tx.wait();
+   status(`Saved on Monad! Transaction: ${tx.hash}`);
+   $('reportForm').reset();
+   await loadReports();
+ } catch(err) {status(`Transaction error: ${err.shortMessage || err.reason || err.message}`);}
+ finally {button.disabled = false;}
+}
+
+async function loadReports() {
+ if (!(await prepareRead())) return;
+ try {
+   $('count').textContent = 'Loading on-chain reports…';
+   let count;
+   try { count = Number(await contract.reportCount()); }
+   catch(err) {
+     if(window.ethereum && signer) {
+       contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, new ethers.BrowserProvider(window.ethereum));
+       count = Number(await contract.reportCount());
+     } else {throw err;}
+   }
+   $('count').textContent = `${count} public observation${count===1?'':'s'}`;
+   markers.clearLayers();
+   const list = $('records'); list.replaceChildren();
+   if (!count) {list.innerHTML='<div class="empty">No reports yet. Submit a test observation to add the first map pin.</div>';return;}
+   const start = Math.max(0, count-100);
+   const ids = Array.from({length:count-start},(_,i)=>count-i-1);
+   const raw = await Promise.all(ids.map(id=>contract.getReport(id)));
+   const bounds = [];
+   raw.forEach((r,i)=>{
+     const id=ids[i], lat=Number(r.latitudeE6)/1e6, lng=Number(r.longitudeE6)/1e6;
+     const type=TYPES[Number(r.damageType)]||'Other';
+     const link=`${EXPLORER}/address/${CONTRACT_ADDRESS}`;
+     const validURL = /^https:\/\//i.test(r.photoURL) ? r.photoURL : '';
+     const item = document.createElement('div'); item.className='record';
+     item.innerHTML=`<div class="recordHead"><h3>#${id} · ${safe(type)}</h3><span class="tag">ON-CHAIN</span></div>
+       <p>${safe(lat.toFixed(6))}, ${safe(lng.toFixed(6))} · ${safe(formatDate(r.submittedAt))}</p>
+       <p>${safe(r.notes || 'No notes')}</p>
+       <p class="tiny">Reporter: ${safe(tag(r.reporter))} · Photo hash: ${safe(r.photoHash.slice(0,16))}…</p>
+       ${validURL?`<img src="${safe(validURL)}" alt="User-provided reef observation photo" loading="lazy" referrerpolicy="no-referrer"><div><a href="${safe(validURL)}" target="_blank" rel="noopener noreferrer" class="link">View full photo ↗</a></div>`:''}
+       <p><a class="link" target="_blank" rel="noopener noreferrer" href="${safe(link)}">Verify contract on Monad ↗</a></p>`;
+     list.appendChild(item);
+     L.marker([lat,lng]).bindPopup(`<b>${safe(type)} · #${id}</b><br>${safe(r.notes.slice(0,180))}<br>Unverified citizen report`).addTo(markers);
+     bounds.push([lat,lng]);
+   });
+   if (bounds.length) map.fitBounds(bounds,{maxZoom:7,padding:[26,26]});
+ } catch(err) { $('count').textContent='Could not load'; status(`Read error: ${err.shortMessage || err.message}. Check contract address and Testnet RPC.`);}
+}
+$('connectBtn').addEventListener('click', connectWallet);
+$('reportForm').addEventListener('submit',submitReport);
+$('refreshBtn').addEventListener('click',loadReports);
+if(window.ethereum) window.ethereum.on?.('accountsChanged',()=>location.reload());
+loadReports();
+</script>
+</body>
+</html>
