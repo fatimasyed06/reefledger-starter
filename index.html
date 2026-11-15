@@ -63,6 +63,22 @@ const safe = (s) => String(s ?? '').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&l
 const formatDate = (v) => new Date(Number(v)*1000).toLocaleString();
 const hexZero = '0x' + '0'.repeat(64);
 const tag = (a) => `${a.slice(0,6)}…${a.slice(-4)}`;
+ 
+function distanceMeters(lat1, lon1, lat2, lon2) {
+  const R = 6371000;
+  const toRad = deg => deg * Math.PI / 180;
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(lat1)) *
+    Math.cos(toRad(lat2)) *
+    Math.sin(dLon / 2) ** 2;
+
+  return 2 * R * Math.asin(Math.sqrt(a));
+}
+
 
 async function prepareRead() {
  if (!ready) {
@@ -130,6 +146,36 @@ async function submitReport(event) {
  finally {button.disabled = false;}
 }
 
+ 
+function groupReefReports(reports) {
+  const groups = [];
+
+  // Organize observations by nearby locations
+  for (const report of reports) {
+    let group = groups.find(g =>
+      g.some(existing =>
+        distanceMeters(
+          existing.lat, existing.lng,
+          report.lat, report.lng
+        ) <= 100
+      )
+    );
+
+    if (group) {
+      group.push(report);
+    } else {
+      groups.push([report]);
+    }
+  }
+
+  // Sort each reef's observations from oldest to newest
+  groups.forEach(group => {
+    group.sort((a, b) => a.timestamp - b.timestamp);
+  });
+
+  return groups;
+}
+
 async function loadReports() {
  if (!(await prepareRead())) return;
  try {
@@ -150,6 +196,19 @@ async function loadReports() {
    const ids = Array.from({length:count-start},(_,i)=>count-i-1);
    const raw = await Promise.all(ids.map(id=>contract.getReport(id)));
    const bounds = [];
+  
+const reefReports = raw.map((r, i) => ({
+  id: ids[i],
+  lat: Number(r.latitudeE6) / 1e6,
+  lng: Number(r.longitudeE6) / 1e6,
+  type: TYPES[Number(r.damageType)] || 'Other',
+  notes: r.notes,
+  timestamp: Number(r.submittedAt),
+  reporter: r.reporter
+}));
+
+const reefGroups = groupReefReports(reefReports);
+
    raw.forEach((r,i)=>{
      const id=ids[i], lat=Number(r.latitudeE6)/1e6, lng=Number(r.longitudeE6)/1e6;
      const type=TYPES[Number(r.damageType)]||'Other';
@@ -163,7 +222,9 @@ async function loadReports() {
        ${validURL?`<img src="${safe(validURL)}" alt="User-provided reef observation photo" loading="lazy" referrerpolicy="no-referrer"><div><a href="${safe(validURL)}" target="_blank" rel="noopener noreferrer" class="link">View full photo ↗</a></div>`:''}
        <p><a class="link" target="_blank" rel="noopener noreferrer" href="${safe(link)}">Verify contract on Monad ↗</a></p>`;
      list.appendChild(item);
-     L.marker([lat,lng]).bindPopup(`<b>${safe(type)} · #${id}</b><br>${safe(r.notes.slice(0,180))}<br>Unverified citizen report`).addTo(markers);
+     const reefGroup = reefGroups.find(group =>
+  group.some(report => report.id === id)
+);
      bounds.push([lat,lng]);
    });
    if (bounds.length) map.fitBounds(bounds,{maxZoom:7,padding:[26,26]});
