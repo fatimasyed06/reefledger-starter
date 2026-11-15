@@ -342,7 +342,7 @@ async function loadReports() {
    raw.forEach((r,i)=>{
      const id=ids[i], lat=Number(r.latitudeE6)/1e6, lng=Number(r.longitudeE6)/1e6;
      const type=TYPES[Number(r.damageType)]||'Other';
-     const link=`${EXPLORER}/address/${CONTRACT_ADDRESS}`;
+     const link=`${EXPLORER}/address/${CONTRACT_ADDRESS}#readContract`;
      const validURL = /^https:\/\//i.test(r.photoURL) ? r.photoURL : '';
      const hash = r.photoHash;
      const item = document.createElement('div'); item.className='record';
@@ -351,7 +351,7 @@ async function loadReports() {
        <p>${safe(r.notes || 'No notes')}</p>
        <p class="tiny">Reporter: ${safe(tag(r.reporter))} · Photo hash: ${safe(String(hash).slice(0,18))}…</p>
        ${photoEvidenceHtml(validURL, hash, `record-${id}`)}
-       <p><a class="link" target="_blank" rel="noopener noreferrer" href="${safe(link)}">Verify contract on Monad ↗</a></p>`;
+       <p><a class="link" target="_blank" rel="noopener noreferrer" href="${safe(link)}">View on Monad Explorer ↗</a></p>`;
      wireVerifyControls(item);
      list.appendChild(item);
      const popup = `<div class="popup-evidence"><b>${safe(type)} · #${id}</b><br>${safe((r.notes || 'No notes').slice(0,180))}<br><span class="tiny">Unverified citizen report</span>${validURL ? photoEvidenceHtml(validURL, hash, `map-${id}`) : '<br><span class="tiny">No photo URL on-chain</span>'}</div>`;
