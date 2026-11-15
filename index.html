@@ -33,7 +33,45 @@ main{max-width:1260px;margin:auto;padding:27px 20px 60px}.hero{display:flex;alig
 <label for="notes">Observation notes</label><textarea id="notes" maxlength="400" placeholder="What was observed? (Unverified citizen report)"></textarea>
 <button class="primary" id="submitBtn" type="submit">Submit to Monad Testnet</button><div id="status">Connect your wallet to submit. You can browse without a wallet.</div>
 </form></section>
-<section class="panel mapPanel"><div class="mapHeader"><h2 style="margin:0">Explore the reef</h2><button id="refreshBtn" class="badge" style="border:0">↻ Refresh</button></div><div id="map"></div><div class="cards" id="records"><div class="empty">No observations yet. Be the first to submit a test report.</div></div></section>
+
+<section class="panel mapPanel">
+
+  <div style="margin-bottom:20px;">
+    <h2 style="margin:0 0 12px;">Reef Monitoring Dashboard</h2>
+
+    <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;">
+
+      <div style="background:#e8f7f4;padding:14px 8px;border-radius:12px;text-align:center;">
+        <div id="totalObservations" style="font-size:28px;font-weight:bold;color:#116b60;">0</div>
+        <div style="font-size:12px;color:#365f58;">Observations</div>
+      </div>
+
+      <div style="background:#e8f7f4;padding:14px 8px;border-radius:12px;text-align:center;">
+        <div id="totalReefAreas" style="font-size:28px;font-weight:bold;color:#116b60;">0</div>
+        <div style="font-size:12px;color:#365f58;">Reef Areas</div>
+      </div>
+
+      <div style="background:#e8f7f4;padding:14px 8px;border-radius:12px;text-align:center;">
+        <div id="totalDamageTypes" style="font-size:28px;font-weight:bold;color:#116b60;">0</div>
+        <div style="font-size:12px;color:#365f58;">Damage Types</div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="mapHeader">
+    <h2 style="margin:0">Explore the reef</h2>
+    <button id="refreshBtn" class="badge" style="border:0">↻ Refresh</button>
+  </div>
+
+  <div id="map"></div>
+
+  <div class="cards" id="records">
+    <div class="empty">No observations yet. Be the first to submit a test report.</div>
+  </div>
+
+</section>
+
 </div><div class="footnote">ReefLedger is a prototype, not a verified scientific database. Locations and classifications are user-submitted claims. On-chain fingerprints detect changes, not whether claims are true. Photos at external URLs can disappear or change.</div>
 </main>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -208,6 +246,12 @@ const reefReports = raw.map((r, i) => ({
 }));
 
 const reefGroups = groupReefReports(reefReports);
+
+$('totalObservations').textContent = reefReports.length;
+$('totalReefAreas').textContent = reefGroups.length;
+$('totalDamageTypes').textContent = new Set(
+  reefReports.map(report => report.type)
+).size;
 
    raw.forEach((r,i)=>{
      const id=ids[i], lat=Number(r.latitudeE6)/1e6, lng=Number(r.longitudeE6)/1e6;
