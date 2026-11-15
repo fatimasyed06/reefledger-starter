@@ -13,6 +13,7 @@
 *{box-sizing:border-box}body{margin:0}button,input,select,textarea{font:inherit}button{cursor:pointer}a{color:#12766b}
 header{background:#083b37;color:white;padding:14px max(22px,calc((100vw - 1250px)/2));display:flex;align-items:center;justify-content:space-between;gap:18px}
 .brand{font:800 23px Manrope,sans-serif;letter-spacing:-1px}.brand span{color:#66dec2}.subtitle{font-size:11px;color:#b8dfd5;letter-spacing:.08em;text-transform:uppercase}
+.headerRight{display:flex;align-items:center;gap:14px;flex-wrap:wrap}.headernav{display:flex;gap:14px;align-items:center}.headernav a{font-size:13px;text-decoration:none;color:#d4eee8}.headernav a[aria-current="page"]{font-weight:700;color:white}
 #connectBtn,.primary{background:#16a085;color:white;border:0;border-radius:11px;padding:12px 17px;font-weight:700}.connect{background:#145951!important}button:disabled{opacity:.55;cursor:not-allowed}
 main{max-width:1260px;margin:auto;padding:27px 20px 60px}.hero{display:flex;align-items:end;justify-content:space-between;gap:25px;margin-bottom:23px}.eyebrow{text-transform:uppercase;letter-spacing:2px;font-weight:800;font-size:11px;color:#218b7d}h1,h2,h3{font-family:Manrope,sans-serif;letter-spacing:-.04em}h1{font-size:clamp(28px,4vw,43px);margin:5px 0 6px}h2{font-size:21px;margin:0 0 13px}p{line-height:1.5;color:#52716b}.hero p{margin:0}.pill{background:#ddf5ed;color:#176f62;border:1px solid #b5e9d7;padding:8px 12px;border-radius:100px;font-size:12px;font-weight:700;white-space:nowrap}
 .layout{display:grid;grid-template-columns:minmax(310px,390px) minmax(0,1fr);gap:18px;align-items:start}.panel{border:1px solid #d8e8e0;background:#fff;border-radius:19px;padding:20px;box-shadow:0 6px 24px #164e3410}label{display:block;font-weight:700;font-size:12px;margin:14px 0 6px}input,select,textarea{width:100%;border:1px solid #d1ded8;border-radius:9px;padding:11px 12px;background:#fcfefd;color:#1d4440;outline-color:#43bba6}textarea{min-height:80px;resize:vertical}.pair{display:grid;grid-template-columns:1fr 1fr;gap:10px}.fine{color:#728982;font-size:11px;line-height:1.5}.primary{margin-top:17px;width:100%;padding:13px}#status{font-size:12px;color:#376d63;line-height:1.55;margin:12px 0 0;white-space:pre-line;overflow-wrap:anywhere}.mapPanel{padding:14px}.mapHeader{padding:7px 6px 14px;display:flex;justify-content:space-between;align-items:center}#map{height:470px;border-radius:13px;background:#d7eae5}.badge{background:#f0f8f4;border-radius:8px;padding:6px 10px;color:#357b6c;font-size:12px;font-weight:700}.cards{display:grid;gap:10px;margin-top:17px}.record{background:white;border:1px solid #dfebe4;border-radius:13px;padding:13px}.recordHead{display:flex;justify-content:space-between;gap:10px;align-items:center}.record h3{font-size:14px;margin:0}.record p{font-size:12px;margin:5px 0}.record img{max-width:100%;max-height:180px;object-fit:cover;border-radius:10px;margin-top:8px}.tag{color:#207a6e;font-size:11px;font-weight:800}.empty{padding:24px;background:#f3faf6;text-align:center;color:#78928a;border-radius:12px}.footnote{margin-top:20px;font-size:11px;color:#798d87}.info{border-left:3px solid #2eab97;padding:8px 10px;background:#f1f9f6;font-size:12px;color:#4c756b;border-radius:4px}.link{font-size:12px;text-decoration:none}.tiny{font-size:10px;color:#9da8a5}.loading{opacity:.7}.verifyBtn{margin-top:8px;border:1px solid #b5e9d7;background:#f0f8f4;color:#176f62;border-radius:8px;padding:7px 10px;font-size:11px;font-weight:700}.verifyMsg{font-size:11px;margin-top:6px;color:#376d63}.leaflet-popup-content img{display:block;max-width:220px;max-height:140px;object-fit:cover;border-radius:8px;margin:8px 0}
@@ -20,7 +21,7 @@ main{max-width:1260px;margin:auto;padding:27px 20px 60px}.hero{display:flex;alig
 </style>
 </head>
 <body>
-<header><div><div class="brand">reef<span>ledger.</span> 🪸</div><div class="subtitle">Powered by Monad Testnet</div></div><button id="connectBtn" class="connect">Connect wallet</button></header>
+<header><div><div class="brand">reef<span>ledger.</span> 🪸</div><div class="subtitle">Powered by Monad Testnet</div></div><div class="headerRight"><nav class="headernav" aria-label="Main navigation"><a href="./index.html" aria-current="page">Report damage</a><a href="./explore.html">Explore</a></nav><button id="connectBtn" class="connect">Connect wallet</button></div></header>
 <main>
 <section class="hero"><div><div class="eyebrow">Open ocean evidence network</div><h1>Document the damage.<br>Protect the reef.</h1><p>Public reef observations, permanently anchored on-chain.</p></div><div id="count" class="pill">Loading observations…</div></section>
 <div class="layout">
@@ -33,7 +34,7 @@ main{max-width:1260px;margin:auto;padding:27px 20px 60px}.hero{display:flex;alig
 <label for="notes">Observation notes</label><textarea id="notes" maxlength="400" placeholder="What was observed? (Unverified citizen report)"></textarea>
 <button class="primary" id="submitBtn" type="submit">Submit to Monad Testnet</button><div id="status">Connect your wallet to submit. You can browse without a wallet.</div>
 </form></section>
-<section class="panel mapPanel"><div class="mapHeader"><h2 style="margin:0">Explore the reef</h2><button id="refreshBtn" class="badge" style="border:0">↻ Refresh</button></div><div id="map"></div><div class="cards" id="records"><div class="empty">No observations yet. Be the first to submit a test report.</div></div></section>
+<section class="panel mapPanel"><div class="mapHeader"><h2 style="margin:0">Recent observations</h2><div style="display:flex;gap:8px;align-items:center"><a class="link" href="./explore.html">Open Explore ↗</a><button id="refreshBtn" class="badge" style="border:0">↻ Refresh</button></div></div><div id="map"></div><div class="cards" id="records"><div class="empty">No observations yet. Be the first to submit a test report.</div></div></section>
 </div><div class="footnote">ReefLedger is a prototype, not a verified scientific database. Locations and classifications are user-submitted claims. On-chain fingerprints detect changes, not whether claims are true. IPFS pins can still be lost if the pinning service drops them.</div>
 </main>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -62,7 +63,10 @@ const ready = ethers.isAddress(CONTRACT_ADDRESS);
 const uploadApiReady = /^https?:\/\//i.test(UPLOAD_API_BASE);
 let signer, readProvider, contract;
 const map = L.map('map').setView([5, 30], 2);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom: 18, attribution: '© OpenStreetMap contributors'}).addTo(map);
+L.tileLayer('https://tile.openstreetmap.de/{z}/{x}/{y}.png', {
+  maxZoom: 18,
+  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> contributors &middot; Tiles via <a href="https://www.openstreetmap.de/" target="_blank" rel="noopener noreferrer">OpenStreetMap.de</a>'
+}).addTo(map);
 let markers = L.layerGroup().addTo(map);
 const status = (s) => { $('status').textContent = s; };
 const safe = (s) => String(s ?? '').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));

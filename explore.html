@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Explore public citizen observations of coral reef damage recorded on Monad Testnet.">
+<title>Explore ReefLedger — Reef Hotspots & History</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+:root{--ink:#153e39;--muted:#55746c;--teal:#0a7568;--sea:#083b37;--bg:#f2f8f5;--border:#d8e8e0;--soft:#e9f6ef;--white:#fff;font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(--ink)}
+*{box-sizing:border-box}body{margin:0}button,input,select{font:inherit}button{cursor:pointer}a{color:var(--teal)}button:disabled{opacity:.55;cursor:not-allowed}
+header{background:var(--sea);color:white;padding:13px max(22px,calc((100vw - 1260px)/2));display:flex;justify-content:space-between;align-items:center;gap:20px}.brand{font:800 23px Manrope,sans-serif;letter-spacing:-1px}.brand span{color:#67dbc1}.micro{font-size:10px;letter-spacing:1.3px;text-transform:uppercase;color:#b5dfd4}.headernav{display:flex;gap:14px;align-items:center}.headernav a{font-size:13px;text-decoration:none;color:#d4eee8}.headernav a[aria-current="page"]{font-weight:700;color:white}
+main{max-width:1290px;margin:auto;padding:26px 20px 55px}h1,h2,h3{font-family:Manrope,sans-serif;letter-spacing:-.035em}h1{font-size:clamp(29px,4vw,44px);line-height:1.15;margin:4px 0 8px}h2{font-size:19px;margin:0 0 12px}h3{font-size:15px;margin:0}p{line-height:1.52;margin:8px 0;color:var(--muted)}.eyebrow{font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#198b7c}.hero{display:flex;justify-content:space-between;align-items:end;gap:16px;margin-bottom:20px}.hero p{margin:0}.pill{background:#ddf5ed;border:1px solid #b6e6d7;border-radius:40px;padding:9px 13px;font-size:12px;white-space:nowrap;font-weight:700;color:#146a60}
+.panel{background:white;border:1px solid var(--border);border-radius:18px;box-shadow:0 6px 20px #164e3410}.filters{padding:17px 18px;margin-bottom:18px}.filtergrid{display:grid;grid-template-columns:1.2fr 1fr .8fr .8fr 1fr;gap:10px;align-items:end}label{font-weight:700;font-size:12px;display:block;margin-bottom:6px}input,select{width:100%;min-height:41px;border:1px solid #cbded5;border-radius:9px;padding:9px 10px;background:#fcfefd;color:#20453e}.actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:12px}.btn{border:1px solid #b8ded1;background:#eff8f3;border-radius:9px;color:#166d61;padding:9px 13px;font-size:12px;font-weight:700}.btn.primary{background:#159e88;border-color:#159e88;color:#fff}.info{font-size:12px;color:#547b70}.layout{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(340px,.8fr);gap:17px;align-items:start}.mapbox{padding:12px}.panelhead{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:6px 5px 13px}.panelhead h2{margin:0}.small{color:#718b83;font-size:11px}#map{height:490px;border-radius:12px;background:#d9ece7}.mapfooter{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:12px 5px 1px;flex-wrap:wrap}.detail{padding:20px;min-height:570px}.detail p{font-size:13px}.empty{border:1px dashed #cbdcd2;border-radius:12px;background:#f7fbf8;padding:20px;text-align:center;color:#69857a;font-size:13px}.timeline{margin-top:16px;border-left:2px solid #cbece0;padding-left:18px}.entry{position:relative;border-bottom:1px solid #ecf2ef;padding:0 0 16px;margin-bottom:16px}.entry:before{content:'';position:absolute;left:-24px;top:5px;background:#159e88;border:3px solid white;box-shadow:0 0 0 1px #99dbca;width:10px;height:10px;border-radius:50%}.entryhead{display:flex;justify-content:space-between;gap:8px;align-items:start}.type{font-weight:800;font-size:12px;color:#12766a}.status{font-size:10px;color:#657c75;border:1px solid #d8e8de;padding:3px 7px;border-radius:40px;white-space:nowrap}.entry .date{font-size:11px;color:#71867f;margin:4px 0}.entry .notes{white-space:pre-wrap;overflow-wrap:anywhere;color:#43665d}.photo{max-width:100%;max-height:190px;border-radius:11px;margin:9px 0;object-fit:cover}.rowlinks{display:flex;gap:12px;flex-wrap:wrap;margin-top:7px}.rowlinks a,.textbtn{font-size:11px;font-weight:700;color:#117567}.textbtn{border:0;background:none;padding:2px 0;text-decoration:underline;cursor:pointer}.verifyresult{font-size:11px;line-height:1.4;margin-top:5px;overflow-wrap:anywhere}.disclaimer{font-size:11px;color:#667f77;line-height:1.55;background:#e9f4ee;padding:11px 13px;border-radius:10px;margin-top:12px}.hotspot-icon{background:#0e8171;border:3px solid #fff;box-shadow:0 2px 8px #0004;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px}.single-icon{background:#2a84bd}.educational{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px}.educational article{padding:16px}.educational p{font-size:12px}.warn{color:#9b4c1b}.muted{color:#71867f}.toggle{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600}.toggle input{min-height:unset;width:auto}.loadstate{font-size:12px;color:#5f8176}.foot{margin-top:23px;font-size:11px;color:#79928a}#map .leaflet-popup-content{font-family:'DM Sans',sans-serif;font-size:12px;line-height:1.4}.map-legend{font-size:11px;color:#6b867d}
+@media(max-width:1100px){.filtergrid{grid-template-columns:repeat(3,1fr)}.layout{grid-template-columns:1fr}.detail{min-height:200px}#map{height:410px}}
+@media(max-width:650px){.filtergrid{grid-template-columns:repeat(2,1fr)}.filtergrid>div:first-child{grid-column:span 2}.hero{align-items:start;flex-direction:column}header{padding:13px 18px}.headernav{gap:9px}#map{height:350px}.educational{grid-template-columns:1fr}main{padding:20px 12px}.pill{white-space:normal}}
+</style>
+</head>
+<body>
+<header><div><div class="brand">reef<span>ledger.</span> 🪸</div><div class="micro">Powered by Monad Testnet</div></div><nav class="headernav" aria-label="Main navigation"><a href="./index.html">Report damage</a><a href="./explore.html" aria-current="page">Explore</a></nav></header>
+<main>
+  <section class="hero"><div><div class="eyebrow">Public reef observation network</div><h1>Explore the reef.<br>Follow its history.</h1><p>Discover citizen observations, explore nearby reports, and export open data—no wallet required.</p></div><span class="pill" id="count">Connecting to Monad…</span></section>
+  <section class="panel filters" aria-label="Observation filters">
+   <div class="filtergrid">
+    <div><label for="search">Search observations</label><input id="search" placeholder="Notes, report #, wallet…" autocomplete="off"></div>
+    <div><label for="category">Damage category</label><select id="category"><option value="all">All categories</option><option value="0">Bleaching</option><option value="1">Physical damage</option><option value="2">Disease</option><option value="3">Pollution</option><option value="4">Other / uncertain</option></select></div>
+    <div><label for="startDate">Submitted after</label><input type="date" id="startDate"></div>
+    <div><label for="endDate">Submitted before</label><input type="date" id="endDate"></div>
+    <div><label for="radius">Group observations within</label><select id="radius"><option value="100">100 m</option><option value="250" selected>250 m</option><option value="500">500 m</option><option value="1000">1 km</option><option value="5000">5 km</option></select></div>
+   </div>
+   <div class="actions"><label class="toggle"><input type="checkbox" id="viewport">Only show reports within visible map</label><button class="btn" type="button" id="reset">Clear filters</button><button class="btn" type="button" id="refresh">↻ Refresh chain data</button><button class="btn primary" type="button" id="csv">↓ Download filtered CSV</button><span class="loadstate" id="loadstate" role="status" aria-live="polite">Loading reports…</span></div>
+  </section>
+  <div class="layout">
+   <section class="panel mapbox"><div class="panelhead"><h2>Reef observations</h2><span class="small" id="shown">—</span></div><div id="map" role="region" aria-label="Interactive map of reported reef observations"></div><div class="mapfooter"><span class="map-legend">● Numbered markers group nearby reports, not confirmed identical reef sites.</span><span class="small">Click a marker to open its history</span></div></section>
+   <section class="panel detail" id="detail" aria-live="polite"><h2>Reef Hotspots & Site History</h2><p>Choose a marker to view the chronological history of observations in that area.</p><div class="empty">Waiting for public on-chain reports…</div></section>
+  </div>
+  <section class="educational" aria-label="About reef damage categories">
+    <article class="panel"><h3>What is coral bleaching?</h3><p>Stressed coral can lose the algae that provide much of its color and energy. Bleaching does not necessarily mean the coral has died.</p></article>
+    <article class="panel"><h3>What counts as damage?</h3><p>Reported physical damage may involve broken colonies, discarded equipment, or storm impacts. An image alone may not establish a cause.</p></article>
+    <article class="panel"><h3>What does the history tell us?</h3><p>A timeline records when different people submitted claims. It is not automatically a scientific measurement of reef recovery or restoration.</p></article>
+  </section>
+  <p class="foot">ReefLedger is a citizen-reporting prototype, not a verified scientific dataset. Coordinates and dates are self-reported/submission metadata; grouped reports are geographically close, not necessarily the same reef site. Downloaded CSVs contain publicly submitted claims. Photos can be changed at third-party URLs unless verified against a nonzero on-chain SHA-256 fingerprint.</p>
+</main>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script type="module">
+import { ethers } from 'https://cdn.jsdelivr.net/npm/ethers@6.15.0/+esm';
+const CONTRACT_ADDRESS = '0x1A58a968b8cf9A1dD1D102c063aaA791fA23E3Db';
+const RPC_URL = 'https://testnet-rpc.monad.xyz';
+const ABI = [
+ 'function reportCount() view returns (uint256)',
+ 'function getReport(uint256 reportId) view returns (tuple(address reporter,int32 latitudeE6,int32 longitudeE6,uint8 damageType,bytes32 photoHash,string photoURL,string notes,uint64 submittedAt))'
+];
+const TYPES = ['Bleaching','Physical damage','Disease','Pollution','Other / uncertain'];
+const ZERO_HASH = `0x${'0'.repeat(64)}`;
+const $ = id => document.getElementById(id);
+const provider = new ethers.JsonRpcProvider(RPC_URL, 10143);
+const contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, provider);
+const map = L.map('map',{worldCopyJump:true}).setView([-18.2867,147.6992],5);
+// Avoid tile.openstreetmap.org (often 403 for apps) and key-gated Carto basemaps.
+L.tileLayer('https://tile.openstreetmap.de/{z}/{x}/{y}.png',{
+  maxZoom:18,
+  attribution:'&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> contributors &middot; Tiles via <a href="https://www.openstreetmap.de/" target="_blank" rel="noopener noreferrer">OpenStreetMap.de</a>'
+}).addTo(map);
+const markerLayer = L.layerGroup().addTo(map);
+let reports = [], groups = [], chosenId = null, loaded = false, partial = false, totalOnChain = 0, firstFit = true, busy = false;
+function esc(value){return String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function shortAddress(s){return `${String(s).slice(0,6)}…${String(s).slice(-4)}`;}
+function dateTime(seconds){return new Date(seconds*1000).toLocaleString();}
+function isoDay(seconds){return new Date(seconds*1000).toISOString().slice(0,10);}
+function imgUrl(value){try{const u=new URL(value);return u.protocol==='https:'?u.href:null;}catch{return null;}}
+function cidFromUrl(url){const m=String(url||'').match(/(?:\/ipfs\/|ipfs:\/\/)([A-Za-z0-9]+)/);return m?m[1]:'';}
+function gatewayCandidates(url){
+  const list=[]; const push=(u)=>{if(u&&/^https:\/\//i.test(u)&&!list.includes(u))list.push(u);};
+  push(imgUrl(url));
+  const cid=cidFromUrl(url);
+  if(cid){
+    push(`https://gateway.pinata.cloud/ipfs/${cid}`);
+    push(`https://ipfs.io/ipfs/${cid}`);
+    push(`https://dweb.link/ipfs/${cid}`);
+    push(`https://cloudflare-ipfs.com/ipfs/${cid}`);
+  }
+  return list;
+}
+function toReport(id,r){return {id,reporter:String(r.reporter??r[0]),lat:Number(r.latitudeE6??r[1])/1e6,lng:Number(r.longitudeE6??r[2])/1e6,type:Number(r.damageType??r[3]),hash:String(r.photoHash??r[4]),url:String(r.photoURL??r[5]),notes:String(r.notes??r[6]),when:Number(r.submittedAt??r[7])};}
+function kmDistance(a,b){const rad=Math.PI/180, dLat=(b.lat-a.lat)*rad,dLng=(b.lng-a.lng)*rad,s=Math.sin(dLat/2)**2+Math.cos(a.lat*rad)*Math.cos(b.lat*rad)*Math.sin(dLng/2)**2;return 6371*2*Math.atan2(Math.sqrt(s),Math.sqrt(1-s));}
+function filtered(){const q=$('search').value.trim().toLowerCase(), cat=$('category').value, start=$('startDate').value, end=$('endDate').value, bounds=$('viewport').checked?map.getBounds():null;
+ return reports.filter(r=> {if(cat!=='all'&&r.type!==Number(cat))return false;if(start&&isoDay(r.when)<start)return false;if(end&&isoDay(r.when)>end)return false;if(q&&!(`${r.id} ${r.notes} ${r.reporter} ${TYPES[r.type]||''}`.toLowerCase().includes(q)))return false;if(bounds&&!bounds.contains([r.lat,r.lng]))return false;return true;});}
+// Single-link grouping: geographic proximity is not proof of an identical monitoring site.
+function cluster(rows,radiusMeters){const parent=rows.map((_,i)=>i),find=i=>{while(parent[i]!==i){parent[i]=parent[parent[i]];i=parent[i];}return i;};
+ const join=(a,b)=>{a=find(a);b=find(b);if(a!==b)parent[b]=a;};
+ for(let i=0;i<rows.length;i++)for(let j=i+1;j<rows.length;j++)if(kmDistance(rows[i],rows[j])*1000<=radiusMeters)join(i,j);
+ const sets=new Map();rows.forEach((r,i)=>{let root=find(i);if(!sets.has(root))sets.set(root,[]);sets.get(root).push(r);});
+ return [...sets.values()].map(items=>{items.sort((a,b)=>a.when-b.when||a.id-b.id);return {key:Math.min(...items.map(r=>r.id)),items,lat:items.reduce((a,r)=>a+r.lat,0)/items.length,lng:items.reduce((a,r)=>a+r.lng,0)/items.length};}).sort((a,b)=>b.items.at(-1).when-a.items.at(-1).when);}
+function makeMarker(group){const n=group.items.length;const d=n>1?40:29;
+ const icon=L.divIcon({className:'',html:`<div class="hotspot-icon ${n===1?'single-icon':''}" style="width:${d}px;height:${d}px">${n}</div>`,iconSize:[d,d],iconAnchor:[d/2,d/2]});
+ const marker=L.marker([group.lat,group.lng],{icon}).addTo(markerLayer);
+ marker.bindTooltip(`${n} nearby observation${n===1?'':'s'}`);
+ marker.on('click',()=>{chosenId=group.key;showDetail(group);});
+}
+function render(){const rows=filtered();groups=cluster(rows,Number($('radius').value));markerLayer.clearLayers();groups.forEach(makeMarker);
+ $('shown').textContent=`${rows.length} report${rows.length===1?'':'s'} · ${groups.length} location group${groups.length===1?'':'s'}`;
+ $('count').textContent=`${reports.length}${partial?' (partial)':''} of ${totalOnChain} public observations`;
+ $('csv').disabled=busy||!rows.length;
+ if(!rows.length){chosenId=null;$('detail').innerHTML='<h2>Reef Hotspots & Site History</h2><div class="empty">No reports match these filters. Try Clear filters or zoom out if map-view filtering is enabled.</div>';return;}
+ const selected=groups.find(g=>g.key===chosenId)||groups[0];chosenId=selected.key;showDetail(selected);
+ if(firstFit && rows.length){firstFit=false;const bounds=L.latLngBounds(rows.map(r=>[r.lat,r.lng]));if(rows.length===1)map.setView([rows[0].lat,rows[0].lng],7);else map.fitBounds(bounds.pad(.25),{maxZoom:9});}
+}
+function entryHtml(r){const candidates=gatewayCandidates(r.url);const url=candidates[0]||null;const canVerify=Boolean(url&&r.hash&&r.hash.toLowerCase()!==ZERO_HASH);
+ const photo=url?`<a href="${esc(url)}" target="_blank" rel="noopener noreferrer"><img class="photo" src="${esc(url)}" alt="Uploaded citizen evidence for report ${r.id}" loading="lazy" referrerpolicy="no-referrer" data-fallbacks="${esc(candidates.slice(1).join('|'))}"></a>`:'<p class="small">No public photo URL recorded</p>';
+ return `<article class="entry"><div class="entryhead"><span class="type">#${r.id} · ${esc(TYPES[r.type]||'Unknown category')}</span><span class="status">UNVERIFIED REPORT</span></div>
+ <div class="date">Submitted ${esc(dateTime(r.when))}</div><div class="notes">${esc(r.notes||'No description provided.')}</div>${photo}
+ <div class="small">${r.lat.toFixed(6)}, ${r.lng.toFixed(6)} · Reporter: ${esc(shortAddress(r.reporter))}</div>
+ <div class="rowlinks"><a href="https://testnet.monadvision.com/address/${esc(CONTRACT_ADDRESS)}" target="_blank" rel="noopener noreferrer">View contract ↗</a>${canVerify?`<button type="button" class="textbtn" data-verify="${r.id}">Verify photo hash</button>`:''}</div>
+ <div class="verifyresult" id="verify-${r.id}" role="status">${url&&!canVerify?'No on-chain photo hash; image cannot be verified.':''}</div></article>`;}
+function showDetail(g){const items=g.items, first=items[0], last=items.at(-1);
+ $('detail').innerHTML=`<div class="panelhead"><h2 style="margin:0">${items.length>1?'Reef hotspot':'Single observation'}</h2><span class="pill">${items.length} report${items.length===1?'':'s'}</span></div>
+ <p>Nearby observations around <strong>${g.lat.toFixed(4)}, ${g.lng.toFixed(4)}</strong>. Proximity does not establish that they document the same reef colony.</p>
+ <p class="small">History: ${esc(isoDay(first.when))}${first.id===last.id?'':` — ${esc(isoDay(last.when))}`}</p>
+ <button type="button" class="btn" id="groupCsv">↓ Export this hotspot CSV</button>
+ <div class="timeline">${items.map(entryHtml).join('')}</div><div class="disclaimer">Community submissions are not scientific verification. A hash match verifies file integrity—not when or where a photo was taken.</div>`;
+ $('groupCsv').addEventListener('click',()=>downloadCsv(items,`reefledger-hotspot-${g.key}.csv`));
+ $('detail').querySelectorAll('[data-verify]').forEach(btn=>btn.addEventListener('click',()=>verifyPhoto(Number(btn.dataset.verify))));
+ $('detail').querySelectorAll('img.photo[data-fallbacks]').forEach(img=>{
+   img.addEventListener('error',()=>{
+     const next=(img.dataset.fallbacks||'').split('|').filter(Boolean);
+     if(!next.length){
+       img.replaceWith(Object.assign(document.createElement('p'),{className:'small',textContent:'Photo failed to load from IPFS/gateway.'}));
+       return;
+     }
+     img.dataset.fallbacks=next.slice(1).join('|');
+     img.src=next[0];
+   },{once:false});
+ });
+}
+async function fetchImageBytes(url){
+  let lastError=new Error('Could not download image for verification.');
+  for(const candidate of gatewayCandidates(url)){
+    try{
+      const response=await fetch(candidate,{cache:'no-store',mode:'cors'});
+      if(!response.ok){lastError=Error(`gateway HTTP ${response.status}`);continue;}
+      return await response.arrayBuffer();
+    }catch(err){lastError=err;}
+  }
+  throw lastError;
+}
+async function verifyPhoto(id){const r=reports.find(x=>x.id===id),target=$(`verify-${id}`);if(!r||!target)return;if(!gatewayCandidates(r.url).length||r.hash.toLowerCase()===ZERO_HASH){target.textContent='Verification unavailable: missing a retrievable URL or on-chain hash.';return;}
+ target.textContent='Fetching original image bytes and calculating SHA-256…';try{const bytes=await fetchImageBytes(r.url);const sha=await crypto.subtle.digest('SHA-256',bytes);const actual='0x'+[...new Uint8Array(sha)].map(v=>v.toString(16).padStart(2,'0')).join('');
+ if(actual.toLowerCase()===r.hash.toLowerCase()){target.style.color='#08755e';target.textContent='✓ Verified: retrieved image bytes match the hash recorded on Monad.';}else{target.style.color='#a33226';target.textContent='✕ Mismatch: the retrieved image differs from the on-chain fingerprint.';}}
+ catch(e){target.style.color='#9b4c1b';target.textContent=`Could not verify automatically (${e.message||e}). The image gateway may block cross-origin access.`;}}
+function csvCell(v){const s=String(v??'');return /[",\r\n]/.test(s)?`"${s.replaceAll('"','""')}"`:s;}
+function downloadCsv(rows,name){const header=['report_id','latitude','longitude','damage_category','submitted_at_utc','reporter_address','notes','photo_url','photo_sha256','verification_note'];const data=rows.map(r=>[r.id,r.lat,r.lng,TYPES[r.type]||'Unknown',new Date(r.when*1000).toISOString(),r.reporter,r.notes,r.url,r.hash,r.hash.toLowerCase()===ZERO_HASH?'No on-chain image hash':'Image hash recorded; authenticity not verified']);
+ // Prefix untrusted spreadsheet text that could be interpreted as a formula.
+ const sanitize=(v)=>{const s=String(v??'');return /^[\s\t\r\n]*[=+@-]/.test(s) && typeof v==='string'?`'${s}`:s;};
+ const text=[header,...data].map(row=>row.map(v=>csvCell(sanitize(v))).join(',')).join('\r\n');const blob=new Blob(['\ufeff',text],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),link=document.createElement('a');link.href=url;link.download=name;document.body.appendChild(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);}
+async function loadReports(){if(busy)return;busy=true;loaded=false;partial=false;reports=[];totalOnChain=0;firstFit=true;$('loadstate').textContent='Connecting to Monad…';$('refresh').disabled=true;$('csv').disabled=true;
+ try{totalOnChain=Number(await contract.reportCount());if(!Number.isSafeInteger(totalOnChain)||totalOnChain<0)throw Error('Unexpected contract report count');
+ $('count').textContent=`0 of ${totalOnChain} public observations`;
+ if(!totalOnChain){$('loadstate').textContent='No reports recorded yet';loaded=true;render();return;}
+ let failures=0;const batchSize=16;for(let start=0;start<totalOnChain;start+=batchSize){const ids=Array.from({length:Math.min(batchSize,totalOnChain-start)},(_,i)=>start+i);const result=await Promise.allSettled(ids.map(i=>contract.getReport(i)));
+ result.forEach((res,j)=>{if(res.status==='fulfilled'){try{const row=toReport(ids[j],res.value);if(Number.isFinite(row.lat)&&Number.isFinite(row.lng)&&Math.abs(row.lat)<=90&&Math.abs(row.lng)<=180)reports.push(row);else failures++;}catch{failures++;}}else failures++;});
+ $('loadstate').textContent=`Loaded ${reports.length} of ${totalOnChain} reports…`;if(start===0 || start+batchSize>=totalOnChain || start%64===0)render();}
+ reports.sort((a,b)=>b.when-a.when||b.id-a.id);partial=failures>0;loaded=true;render();$('loadstate').textContent=partial?`Loaded ${reports.length}/${totalOnChain}; ${failures} could not be read. Retry Refresh.`:`Loaded ${reports.length} records from Monad.`;
+ }catch(error){partial=true;$('count').textContent='Data unavailable';$('loadstate').textContent=`Failed to load data: ${error.shortMessage||error.message||error}`;render();}
+ finally{busy=false;$('refresh').disabled=false;$('csv').disabled=!filtered().length;}}
+['search','category','startDate','endDate','radius','viewport'].forEach(id=>$(id).addEventListener(id==='search'?'input':'change',render));
+$('reset').addEventListener('click',()=>{$('search').value='';$('category').value='all';$('startDate').value='';$('endDate').value='';$('radius').value='250';$('viewport').checked=false;chosenId=null;render();});
+$('refresh').addEventListener('click',loadReports);
+$('csv').addEventListener('click',()=>{const rows=filtered();if(rows.length)downloadCsv(rows,'reefledger-filtered-observations.csv');});
+map.on('moveend',()=>{if($('viewport').checked)render();});
+loadReports();
+</script>
+</body>
+</html>
